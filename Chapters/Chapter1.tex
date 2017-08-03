@@ -1,0 +1,42 @@
+% Chapter 1
+
+\chapter{Foundations} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1}
+
+%----------------------------------------------------------------------------------------
+
+% Define some commands to keep the formatting separated from the content
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\tabhead}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{\bfseries#1}}
+\newcommand{\option}[1]{\texttt{\itshape#1}}
+
+%----------------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The past and continuing work on natural language comprehension Systems has given rise to programs that appear to understand human language. Such as Wolpharme Alpha (semantic search) or Ai assistens that can answer simple questions and comprehend a certain set of commands. But in the context of OpenCog which has the stated goal of creating a framwork for and an implementation of Artifical General Intelligence, just being able to comrpehend a subset of natural language text is insufficent. This has lead to various projects tyring to improve the current NLP pipline of OpenCog.
+The first step of which is to grammatically analyse the English text using the Link Grammar Parser (ref). One of the Projects is trying to replace the handwritten Grammar Definition used by Link Grammar with on created through machine learning. The parsed English is then used as an input to RelEx. RelEx is an English language semantic dependency relationship extractor. RelEx already creates an output using Atomese Syntax but it is not yet represented in a way that could be used for reasoning. The final step is then to convert this output into PLN style Atomese using RelEx2Logic. This last step is the one that is still most problematic. Because it is just a set of handwritten rules the coverage and accuracy of this is lacking. While this might be fixable with enough effort the final goal of OpenCog is to not depend on such handwritten rules if possible and instead learn them when needed.
+To solve this issue we propose using Lojban as an intermediate Representation. It's unambiguos grammar that has been refined through actuall use will hopefully lead to an Atomese Representation that retains simplicity inherent in a spoken Language.
+
+\section{OpenCog}
+
+Here a quick overview of the OpenCog framework and how the NLP subsystem fits into it. OpenCog consists of various other sub-system that are PLN (Probabilistic Logic Network : For propabilistic and uncertain logical inference),OpenPsy (Emotion Modeling and Action Selection),MOSES (Meta Optimizing Semantic Evolutionary Search : For program learning),ECAN (Economic Attention Network : Attention selection),DeSTIN (Deep Spatio Temporal Inference Network : For sensory comprehension and mapping of subsymbloic ot symbloic represntations),Pattern Miner (for extrating frequent and intersting pattersn) which are tied together using a common language Atomese.
+
+\subsection{Atomese}
+
+Atomese is the language of the OpenCog Platform and although it can also represent programs here we will only focus on the knowledge representation aspects. The language was designed with the goal of using it in conjunction with PLN to do reasoning. Fundamentally it is also based on Predicate Logic extended with Probability Theory. Each Statement is represented by a labeled Hypergraph. The primary Element being an Atom that has 2 main subtypes namely Nodes and Links. Example Graph:
+
+\begin{lstlisting}
+ContextLink tv
+	ConceptNode “earth” tv
+    InheritanceLink tv
+		ConceptNode “mouse” tv
+		ConceptNode “animal” tv
+\end{lstlisting}
+
+Every Atom has a TruthValue which can come in various form the most basic one being a "Simple TruthValue" cosisting of a mean Strenght and a Confidence Value. But in the folloing i will often leave out the TV when writing Atomese.
+
+The 2 Node Types used by PLN are ConceptNode's and PredicateNode's

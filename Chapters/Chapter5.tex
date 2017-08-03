@@ -1,0 +1,435 @@
+% Chapter 1
+
+\chapter{Lojban Atomese Mappings} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1}
+
+%----------------------------------------------------------------------------------------
+
+% Define some commands to keep the formatting separated from the content
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\tabhead}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{\bfseries#1}}
+\newcommand{\option}[1]{\texttt{\itshape#1}}
+
+%----------------------------------------------------------------------------------------
+
+\section{Similarities}
+
+First we will look at the parts in which Lojban and Atomese are similar as well as give some examples.
+
+\subsection{Basic Structure}
+
+As both are based on Predicate Logic the simplest example is just a Predicate with simple Arguments. In Lojban that would be a root word as a Predicate and pro-nouns for Arguments. In Atomese they are represented by either a PredicateNode or a ConceptNode. Which are then linked using a EvalutionLink.
+In this simple case each Word can be directly converted to a Node and linked appropriately:
+
+\begin{center}
+    \begin{tabular}{| p{7cm} | p{7cm} |}
+        \hline
+        Lojban & Atomese \\
+        \hline
+        \begin{center}
+mi jimpe ti \newline
+Definition: \newline
+jimpe : x1 understands fact x2 about subject x3 \newline
+ti : this here; immediate demonstrative it;
+        \end{center}
+        &
+        \begin{lstlisting}
+EvaluationLink tv
+    PredicateNode "understand"
+    ListLink
+        ConceptNode "I"
+        CondeptNode "this"
+        \end{lstlisting} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+\subsubsection{Instance Handling:}
+
+In Lojban or natural languages the meaning of words is very often Context dependent. Depending on the time and location the words I,you,this,that,... can refer to different things. To make this distinction clear in Atomese we will be using 1 general Concept and 1 instance Concept. Where in a given Context the Instance inherits from the General Concept.
+Similarly we will have a Instance of a Predicate and a General Version. Where the instance only describes the specific relation in the given Context whereas the general version describes all relations of this kind.
+So the Example above actually looks more like:
+
+\begin{lstlisting}
+ContextLink
+    ConceptNode "context"
+    SetLink
+        EvaluationLink tv
+            PredicateNode "understanding_instance_789"
+            ListLink
+                ConceptNode "me_instance_123"
+                ConceptNode "this_instance_456"
+        InheritanceLink
+            ConceptNode "me_instance_123"
+            ConceptNode "me"
+        InheritanceLink
+            ConceptNode "this_instance_456"
+            ConceptNode "this"
+        ImplicationLink
+            PredicateNode "understanding_instance_456"
+            PredicateNode "understanding"
+\end{lstlisting}
+
+
+\subsection{Predicate to Object conversion}
+
+As there are no Nouns in Lojban if you want to talk about Dogs for example you have to extract this Concept from the associated Predicate. Which is done using words of the class LE in this case “lo” which is the most commonly used.
+
+\begin{center}
+    \begin{tabular}{| p{7cm} | p{7cm} |}
+        \hline
+        Lojban & Atomese \\
+        \hline
+        \begin{center}
+lo gerku
+
+Definition:
+
+gerku : x1 is a dog of breed x2
+lo : veridical descriptor: the one(s) that really is(are) …
+        \end{center}
+        &
+        \begin{lstlisting}
+SatisfyingSetLink tv
+  EvaluationLink
+    PredicateNode "is a dog"
+      ListLink
+        VariableNode "$1"
+        \end{lstlisting} \\
+        \hline
+    \end{tabular}
+\end{center}
+
+The meaning of “lo gerku” is any object that could be placed into the first place of “gerku”. So we have an object that is a dog of an unspecified breed. Note that while i have been using the Singular the Lojban phrase does not specify the number in this example. It can be done but just using “lo” you could be talkinga about 1 or many dogs.
+
+Similarly in Atomese the SatisfyingSetLink extracts the Set of all Atoms that could be substituted for the VariableNode. The fuzzy MemberShip of that Atom in the set is then based on the TruthValue of the given Graph that contains the Atom. So in the example above Atomes that would result in a high TruthValue of the EvalutionLink (i.e. Dogs) would be the defining Members of the Resulting Set.
+
+\subsection{2.1.3 Intensional and Extensional Inheritance}
+
+In Atomese there are 2 types of Inheritance Intensional and Extensional. For an extensive explanation read “Probabilistic Logic Networks” Book. In short Extensional Inheritance describes a situation where the elements in Set A are also elements in Set B. Which is why it is also called a subset relationship. On the other hand Intensional Inheritance says something about the properties of the set. So if the Properties of the Set A are also Properties of the Set B than A intensionally Inherits from B.
+Though most often we just use an Inheritance Link which is defined as mix of both i.e.:
+
+\begin{lstlisting}
+OrLink
+    Extensional Inheritance Link
+       X
+       Y
+    Intensional Inheritance Link
+       X
+       Y
+\end{lstlisting}
+
+Lojban has a similar distinction in the word class LE. The Words beginning with lo (lo,lo’e,lo’i,loi) are all used to describe objects which are a subset of the objects that fit in the Predicate. On the other hand the words starting with le (le,le’e,le’i,lei) are all used for objects which can only be described as something else. For example a box is not a table but depending on the Situation it could be used/described like one.
+
+
+\section{Lojban}
+
+\subsection{Modifying Arguments in a Commonsensical way.}
+
+In Lojban there are a lot of ways to fiddle with the argument places of a given Predicate which are all designed to make it simpler to express various things.
+
+\subsubsection{Empty Arg Places.}
+
+As we have seen in the above example it is possible to leave an argument slot free. By default it is then filled by the pro-sumit “zo’e” which has a value that makes the statement true in the given context. This defaulting either happens on trailing unfilled argument places or for the x1 place if there is no argument in front of the Predicate.
+In Atomese we choose not to represent these at all as they contain no important Information.
+If one explicitly uses “zo’e” then it will also be present in the Atomese output as there is the possibility of using quantifiers or relative phrase with it.
+
+\subsubsection{Additional Arg Places}
+
+In Lojban it can easily happen that a given Predicate is missing an Argument Slot to easily express what you want to say. In these cases it is possible to integrate the Argument Slot of another Predicate into Relation. Example:
+
+\begin{center}
+mi viska do fi'o kanla [fe'u] ti (example 5.1 CLL)
+       I see you [modal] eye: this one
+       I see you with this eye.
+
+viska: x1 sees x2 under conditions x3
+kanla: x1 is an/the eye of body x2
+ti: this here; immediate demonstrative it; indicated thing/place near speaker.
+\end{center}
+
+In this case the speaker states that he see you with his eye. Unfortunately “viska” has no argument place for the eye that you use to see. So we will have to take it from the predicate “kanla” and add it to the Statement. This is done using “fi’o predicate fe’u object”.
+If we didn’t have that option we would have to use the more complicated sentence:
+
+mi pilno lo kanla pe ti lo nu mi viska do
+I use an eye associated with this for the event of me seeing you.
+pilno: x1 uses/employs x2 [tool, agent, ...] for purpose x3.
+
+When Translating to Atomese the Primary Predicate will imply the Secondary One.
+
+\subsection{Tanru}
+
+In english you have adjectives and adverbs to modify nouns and verbs. Whereas in lojban since everything is based on Predicates the only way to achieve a similar result is by having one predicate modify another.
+
+\begin{center}
+ti blanu tsani
+This is a blue type-of sky.
+This is a blue sky.
+
+blanu: x1 is blue
+tsani: x1 is an expanse of sky/the heavens at place x2
+\end{center}
+
+Similar to english the left predicate modifies the right one. So in the case of  “blanu zdani” the resulting predicate is still primarily about a house and also retains all argument places from “zdani” but now has some properties of blueness.
+In Atomese the naive solution would be to have the instance predicate imply booth underlying predicates namely blanu and tsani but this would cause issue as the following sentence would have the same meaning as the first example.
+
+\begin{center}
+ti tsani blanu
+This is blue in a sky type-of way.
+This is sky blue.
+\end{center}
+
+So to differentiate between the primary Predicate and the modifying one the instance Predicate normally implies the general form of the primary Predicate but intensionally implies the modifying Predicate. That could then be interpreted as the new Predicate implying all things related to the primary Predicate but only some properties of the modifying one. Even with this encoding something is lost as they way this modification works differs slightly on a case by case basis. Hopefully the system will be able to learn these differences even without them being explicitly hinted at in the translation output.
+
+\subsection{Statement Predicate Conversion}
+
+When saying things like “I like to understand things.” we make statements about other statements. So we need a way to convert a statement into a object that we can use as an Argument. The first step is to abstract the statement into a predicate using the words of class NU. Combined with the LE Class we can then make a object described by a whole statement.
+
+\begin{center}
+    mi nelci lo nu mi jimpe
+    I like the event of me understanding
+    I like it if i understand something.
+
+nu: abstractor: generalized event abstractor; x1 is an event of [bridi].
+\end{center}
+
+In this case “nu” takes the statement “mi jimpe” and abstracts it into a predicate : x1 is the event of “me understanding”.
+In Atomese the statement is represented by a predicate that only applies to the situation described in the statement. So we now have to convert that into a predicate that associates a concept with this predicate. For this we use another predicate that has as it’s first argument the concept and as a second argument the predicate of the event.
+But since the event of me understanding is not 1 specific event. We cannot use the given predicate directly instead any predicate that fulfils the same constraints as the given one would be valid.
+
+If we but it all Together we get the following:
+\begin{center}
+    \begin{tabular}{| p{8cm} | p{6cm} |}
+        \hline
+        Atomese & Explanation \\
+        \hline
+        \begin{lstlisting}
+EquivalenceLink
+ EvaluationLink
+  PredicateNode "nu_mi_jimpe"
+  ListLink
+   VariableNode "Arg"
+ MemberLink
+  VariableNode "Arg"
+  SatisfyingSetLink
+   VariableNode "$2"
+    ExistsLink
+     VariableListLink
+      TypedVariableLink
+       VariableNode "PredVar"
+       TypeNode "PredicateNode"
+     AndLink
+      ImplicationLink
+       PredicateNode "event_inst"
+       PredicateNode "event"
+      AndLink
+       EvaluationLink
+        PredicateNode "event_arg1"
+        ListLink
+         PredicateNode "event_inst"
+         ConceptNode "$2"
+       EvaluationLink
+        PredicateNode "event_arg2"
+        ListLink
+         PredicateNode "event_inst"
+         VariableNode "PredVar"
+      EvaluationLink
+       PredicateNode "jimpe_arg1"
+       ListLink
+        VariableNode "PredVar"
+        ConceptNode "mi_instance"
+      ImplicationLink
+       VariableNode "PredVar"
+       PredicateNode "jimpe"
+      InheritanceLink
+       ConceptNode "mi_instance"
+       ConceptNode "mi"
+        \end{lstlisting}
+        &
+        \begin{center}
+This is our abstracted Predicate and it is defined by it’s equivalence to the following Term. \newline
+
+Any Argument that applies to the predicate is also a Member of the Set of all Events the fullfile the Constraints \newline
+
+We can only define that if there exists at least one Predicate fulfilling the conditions. \newline \newline \newline
+
+Here we define a instance Predicate for this specific Event. \newline \newline
+
+The First Argument is a ConceptNode that describes one event. \newline \newline
+
+The second argument is the Predicate defining the Event \newline \newline \newline
+
+            And as a constraint a sepcific instance of ‘mi’ hast to apply to this predicated. \newline \newline
+
+Additionally it has to be of a specific Type. \newline
+        \end{center}
+        \\ \hline
+    \end{tabular}
+\end{center}
+
+\subsection{Metalinguistic Expressions}
+
+In lojban you can have Statements that are not about the current topic but comment on the discourse itself. Those Statements are marked with the non-mathematical parenthesis “to .. toi” for remarks made by the speaker or “to’i … toi” for remarks made by an editor. These Statements can’t affect anything in the normal discourse but they can reference it by using already assigned KOhA and GOhA. If they themselves assign KOhA/GOhA those assignments get reverted after the discursive statement finishes.
+
+Similarly we have Statements surrounded by “sei … se’u” they are like “to … toi” with the difference that they do not stand on their own but are attached semantically to a part of the normal discourse. Usually the part SEI is attached to could fill an unfilled slot of the Predicate used in the SEI Statement, if it is itself a statement it would first have to converted into a Object using “lo nu/du’u”. Which is most often the case because when attaching a SEI statement to a sumti/object it acts very much like a relative clause.
+
+Figuring out which unfilled slot is filled is not as easy as in other cases. Most rules similar to this one always consider the first unfilled slot as the relevant one. But when filling out the slot one has to consider the Type of argument one is dealing with. Explain this earlier in the generic Lojan intro?. In Lojban there are 3 main types of arguments Clauses , Entities and Numbers with the first to having further subtypes. Each argument slot has a Type that restricts what argument can be placed in it. In normal conversations these rules are often ignored as the intended meaning is relatively easy to comprehend for a human.  Example:
+
+\begin{center}
+mi djica lo plise
+I want apples.
+djica: x1 (entity) desires/wants x2 (clause)
+plise: x1 (entity) is an apple
+\end{center}
+
+Here the x2 place of djica should contain a clause but instead has an entity (the LE phrase has the same type ase the argument slot it extracts). It is not clear if you want to have/eat/buy/… the apples. Though this is likely apparent from context.
+
+So in the case of sei where you already have a argument with a certain type it belongs into the first unfilled slot with the same type.
+
+
+\subsection{Attitudinals}
+
+In lojban the word class UI is used to express and make explicit the attitude or related notions off the speaker. Practically they act the same as SEI statements but with the subject of the Statement always being the speaker. Almost all UI can be translated into a SEI statement with equivalent meaning. Since this is only true for most UI the translator can’t just replace all UI with equivalent SEI. Instead UI are treated as Predicates which apply to the attached sentence part. And we provide the Systems with the knowledge of equivalent UI and SEI statements so far as they exist.
+For example:
+\begin{center}
+do ui jimpe = do sei mi cinmo be lo ka gelki se’u jimpe
+ui: attitudinal: happiness - unhappiness
+cinmo: x1 feels emotion x2 (ka) about x3.
+gelki: x1 is happy/merry/glad/gleeful about x2
+ka: abstractor: property abstractor; x1 is quality/property exhibited by [bridi].
+\end{center}
+
+Not providing the system with such a mapping would make it a lot harder for the system to learn the semantics. Since there would be multiple ways to express the same meaning it would have to additionally learn those equivalences.
+
+\subsection{Same word different location different meaning ???}
+
+In Lojban there are Words that based on their location in the Syntax have different but related meanings. I good example of this are words of the class PU.
+
+\begin{center}
+    \begin{tabular}{| p{7cm} | p{7cm} |}
+        \hline
+        Lojban & Explanation \\
+        \hline
+        mi pu jimpe \newline I in the past understood & Here it set’s the tense of the statement \\
+        \hline
+        mi jimpe pu do \newline I understood something in your past/before you &  Here it adds a tense place to the predicate \\
+        \hline
+        mi jimpe i pu bo do jimpe \newline I understood before You understood & Here it describes the relationship between 2 statements \\
+        \hline
+    \end{tabular}
+\end{center}
+
+
+\subsection{Utilizing a working memory}
+
+As in most spoken languages in Lojban the order of sentences matters and there are easy ways to refer to already mentioned things pro-nouns. Contrary to Atomese that like many logic systems has no inherent order to the set of Statements.
+One of the ways this is used in Lojban are the Word Classes KOhA and GOhA for Objects and Predicates respectively.
+
+\begin{center}
+    ko’a goi la .alis. klama le zarci .i ko’a blanu
+    It-1 also-known-as Alice goes to the store. It-1 is blue
+\end{center}
+
+First we define that it-1/ko’a refers to Alice and then we use that to refer to alice in an easy way. In Atomese on the other hand all occurrences of ko’a have to be replaced by the Concept that represents Alice in this Context.
+
+\section{Atomese}
+
+\subsection{Explicit Truth Values}
+
+One significant difference is that in Atomese every Atom has an associated probabilistic Truth Value.
+
+\subsection{Less Implicit Information}
+
+Another significant difference is the amount of implicit Information in a given Lojban / Atomese Statement which would be best demonstrated with an example.
+
+\begin{center}
+    \begin{tabular}{| p{7cm} | p{7cm} |}
+        \hline
+        Lojban & Atomese \\
+        \hline
+        \begin{center}
+mi jimpe
+
+
+
+
+The statement is true in a specific Context
+
+
+
+The actual statement
+
+
+The predicate describing this situation implies a general version
+
+The “mi” in this context inherits from a more general Concept of “mi”
+
+The Context in which the statement is true is in some relation to the current Context
+
+This relation is a combination of a temporal offset
+and a spatial offset
+
+
+
+The temporal offset implies some direction “PU” and distance “ZI”
+
+
+
+The spatial offset implies some direction “FAhA” and distance “VA”
+        \end{center}
+        &
+        \begin{lstlisting}
+ListLink
+  AnchorNode "StatementAnchor"
+  ListLink
+    ListLink
+      ContextLink
+        SetLink
+          ConceptNode "1Wukqb4HQsev0ocNQLtw"
+
+        EvaluationLink (stv 0.750000 0.900000)
+          PredicateNode “sumti1"
+          ListLink
+            PredicateNode "YHCDzFH2PubhwYkYQeAv___jimpe"
+            ConceptNode "ojrdBR1KFW2HlQDCGF9q___mi"
+
+      ImplicationLink (stv 1.000000 0.900000)
+        PredicateNode "YHCDzFH2PubhwYkYQeAv___jimpe"
+        PredicateNode "jimpe"
+
+      InheritanceLink (stv 1.000000 0.900000)
+        ConceptNode "ojrdBR1KFW2HlQDCGF9q___mi"
+        ConceptNode "mi"
+
+      EvaluationLink
+        PredicateNode "IpjvEZLtI0Cuw0q4irKP___ilSvZzbG0M146X0pUEB5"
+        ListLink
+          ConceptNode "1Wukqb4HQsev0ocNQLtw"
+          ConceptNode "NowAndHere"
+
+      ImplicationLink
+        PredicateNode "IpjvEZLtI0Cuw0q4irKP___ilSvZzbG0M146X0pUEB5"
+        AndLink
+          PredicateNode "XvyfNcezKnE9qcpLY414___offset"
+          PredicateNode "B43HePzTgxqsweYXx8BX___offset"
+
+      ImplicationLink
+        PredicateNode "XvyfNcezKnE9qcpLY414___offset"
+        PredicateNode "ZI"
+      ImplicationLink
+        PredicateNode "XvyfNcezKnE9qcpLY414___offset"
+        PredicateNode "PU"
+
+      ImplicationLink
+        PredicateNode "B43HePzTgxqsweYXx8BX___offset"
+        PredicateNode "VA"
+      ImplicationLink
+        PredicateNode "B43HePzTgxqsweYXx8BX___offset"
+        PredicateNode "FAhA"
+        \end{lstlisting}
+    \end{tabular}
+
+The information about the Context is left completely implicit in the Lojban version as well as things like "mi" not referring to the same object all the time.

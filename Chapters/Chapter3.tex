@@ -1,0 +1,30 @@
+% Chapter 1
+
+\chapter{Introduction to Lojban} % Main chapter title
+
+\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1}
+
+%----------------------------------------------------------------------------------------
+
+% Define some commands to keep the formatting separated from the content
+\newcommand{\keyword}[1]{\textbf{#1}}
+\newcommand{\tabhead}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{\bfseries#1}}
+\newcommand{\option}[1]{\texttt{\itshape#1}}
+
+%----------------------------------------------------------------------------------------
+
+\section{Background}
+
+Originally a language called Loglan was developed by James Cook Brown to test the Sapphire-Worth Hypothesis as such it was designed to be fundamentally different from natural languages. In 1987 the community split leading to the development of what we now know as Lojban. The underlying design of the Lojban grammar is based on predicate logic as such each statement normally consists of 1 predicate comparable with a verb and 1 or more arguments applied to it. Great care was taken to ensure that the resulting syntax would not allow for multiple interpretations as is common in natural languages. This with the fact that there are no exceptions to any of the rules leads to a language that is significantly easier to deal with for a computer. And makes it feasible to write a system that could syntactically translate Lojban into a different Knowledge representation Language.
+The primary object of Lojban syntax is the bridi describing one predicate relation and consisting of one selbri/predicate and a number of sumti/arguments.
+
+mi : me/we the speaker(s)
+do : you the listener(s)
+tavla : x1 talks to x2 about x3
+
+mi tavla do = I am talking to you
+
+As we can see the Predicate has a number of argument places x1-x3 (Some predicates have up to 5 argument places by default) one of which we have not filled in the above statement.
+\section{Grammar}
